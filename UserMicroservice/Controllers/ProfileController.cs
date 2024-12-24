@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using UserMicroservice.Models.Exceptions;
 using UserMicroservice.Services.Interfaces;
+using UserMicroservice.Models.DTO;
 
 
 namespace UserMicroservice.Controllers
@@ -28,6 +29,29 @@ namespace UserMicroservice.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+        [HttpPost("update")]
+        public IActionResult UpdateProfile([FromBody] ProfileDTO newProfile)
+        {
+            try
+            {
+                var profile = _profileService.Update(newProfile);
+                return Ok(profile);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {

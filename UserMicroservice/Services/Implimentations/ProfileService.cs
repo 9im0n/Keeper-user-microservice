@@ -2,17 +2,20 @@
 using UserMicroservice.Repositories.Interfaces;
 using UserMicroservice.Services.Interfaces;
 using UserMicroservice.Models.Exceptions;
+using UserMicroservice.Models.DTO;
 
 namespace UserMicroservice.Services.Implimentations
 {
     public class ProfileService : IProfileService
     {
         private readonly IProfileRepository _profileRepository;
+        private readonly IUserService _userService;
 
 
-        public ProfileService(IProfileRepository profileRepository)
+        public ProfileService(IProfileRepository profileRepository, IUserService userService)
         {
             _profileRepository = profileRepository;
+            _userService = userService;
         }
 
 
@@ -50,15 +53,27 @@ namespace UserMicroservice.Services.Implimentations
                 Name = "",
                 AvatarUrl = "",
                 Description = "",
-                UserId = user.Id
+                UserId = user.Id,
+                User = user
             };
 
             return _profileRepository.Create(newProfile);
         }
 
 
-        public Profiles Update(Profiles profile)
-        {
+        public Profiles Update(ProfileDTO newProfile)
+        { 
+            var user = _userService.GetById(newProfile.UserId);
+
+            if (user.ProfileId != newProfile.Id)
+                throw new BadRequestException("Вы не являетесь обладателем этого профиля.");
+
+            Profiles profile = _profileRepository.GetById(newProfile.Id);
+
+            profile.Name = newProfile.Name;
+            profile.AvatarUrl = newProfile.AvatarUrl;
+            profile.Description = newProfile.Description;
+
             return _profileRepository.Update(profile);
         }
     }

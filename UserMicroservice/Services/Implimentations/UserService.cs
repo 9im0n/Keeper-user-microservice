@@ -8,12 +8,10 @@ namespace UserMicroservice.Services.Implimentations
     public class UserService : IUserService
     {
         private readonly IUsersRepository _userRepository;
-        private readonly IProfileService _profileService;
 
-        public UserService(IUsersRepository userRepository, IProfileService profileService)
+        public UserService(IUsersRepository userRepository)
         {
             _userRepository = userRepository;
-            _profileService = profileService;
         }
         
 
@@ -52,14 +50,7 @@ namespace UserMicroservice.Services.Implimentations
             if (existUser != null)
                 throw new AlreadyExistsException("Пользователь с таким Email уже существует.");
 
-            Users newUser = _userRepository.Create(user);
-            var profile = _profileService.Create(newUser);
-            newUser.Profile = profile;
-            newUser.ProfileId = profile.Id;
-
-            newUser = Update(newUser);
-
-            return newUser;
+            return _userRepository.Create(user);
         }
 
 

@@ -9,10 +9,12 @@ namespace UserMicroservice.Services.Implimentations
     public class AuthService : IAuthService
     {
         private readonly IUserService _usersService;
+        private readonly IProfileService _profileService;
 
-        public AuthService(IUserService usersService)
+        public AuthService(IUserService usersService, IProfileService profileService)
         {
             _usersService = usersService;
+            _profileService = profileService;
         }
 
 
@@ -24,6 +26,11 @@ namespace UserMicroservice.Services.Implimentations
                 Password = HashPassword(request.Password),
                 CreatedAt = DateTime.UtcNow,
             });
+
+            var profile = _profileService.Create(newUser);
+            newUser.Profile = profile;
+            newUser.ProfileId = profile.Id;
+            _usersService.Update(newUser);
 
             return newUser;
         }
