@@ -16,6 +16,17 @@ namespace UserMicroservice.Services.Implimentations
         }
 
 
+        public Profiles GetById(Guid id)
+        {
+            Profiles profile = _profileRepository.GetById(id);
+
+            if (profile == null)
+                throw new NotFoundException("Профиля с таким Id не существует.");
+
+            return profile;
+        }
+
+
         public Profiles GetByUserId(Guid userId)
         {
             Profiles profile = _profileRepository.GetByUserId(userId);
@@ -39,8 +50,7 @@ namespace UserMicroservice.Services.Implimentations
                 Name = "",
                 AvatarUrl = "",
                 Description = "",
-                UserId = user.Id,
-                User = user,
+                UserId = user.Id
             };
 
             return _profileRepository.Create(newProfile);
