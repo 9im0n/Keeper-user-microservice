@@ -6,6 +6,7 @@ using System.Security.Claims;
 using UserMicroservice.Repositories.Interfaces;
 using UserMicroservice.Models.Database;
 using UserMicroservice.Models.DTO;
+using UserMicroservice.Models.Exceptions;
 
 namespace UserMicroservice.Services.Implimentations
 {
@@ -20,7 +21,7 @@ namespace UserMicroservice.Services.Implimentations
             _refreshTokens = refreshTokens;
         }
 
-        public JwtResponse CreateJwtTokens(Users user)
+        public JwtResponseDTO CreateJwtTokens(Users user)
         {
             string accesToken = GenerateJwtToken(user);
             Guid refreshToken = GenerateRefreshToken();
@@ -37,25 +38,29 @@ namespace UserMicroservice.Services.Implimentations
                 _refreshTokens.Create(new RefreshTokens { Token = refreshToken, User = user, UserId = user.Id });
             }
 
-            return new JwtResponse
+            return new JwtResponseDTO
             {
                 accessToken = accesToken,
                 refreshToken = refreshToken.ToString()
             };
         }
 
-        public JwtResponse UpdateJwtTokens(string refreshToken) 
+        public JwtResponseDTO UpdateJwtTokens(string refreshToken) 
         {
             if (!Guid.TryParse(refreshToken, out Guid token))
-                return null;
+                throw new BadHttpRequestException("Ошибка обработки refresh токена.");
 
             RefreshTokens oldToken = _refreshTokens.GetByToken(token);
+
+            if (oldToken == null)
+                throw new NotFoundException("Данный refresh токен не действителен.");
+
             oldToken.Token = GenerateRefreshToken();
             _refreshTokens.Update(oldToken);
 
             string accessToken = GenerateJwtToken(oldToken.User);
 
-            return new JwtResponse
+            return new JwtResponseDTO
             {
                 accessToken = accessToken,
                 refreshToken = oldToken.Token.ToString()

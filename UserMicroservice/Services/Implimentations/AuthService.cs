@@ -17,8 +17,18 @@ namespace UserMicroservice.Services.Implimentations
             _profileService = profileService;
         }
 
+        private bool CheckPassword(Users user, string password)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, user.Password);
+        }
 
-        public Users Register(AuthRequest request)
+        private string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+
+        public Users Register(AuthRequestDTO request)
         {
             Users newUser = _usersService.Create(new Users
             {
@@ -36,7 +46,7 @@ namespace UserMicroservice.Services.Implimentations
         }
 
 
-        public Users Login(AuthRequest request)
+        public Users Login(AuthRequestDTO request)
         {
             Users user = _usersService.GetByEmail(request.Email);
 
@@ -44,17 +54,6 @@ namespace UserMicroservice.Services.Implimentations
                 throw new BadRequestException("Неверный email или пароль.");
 
             return user;
-        }
-
-
-        private bool CheckPassword(Users user, string password)
-        {
-            return BCrypt.Net.BCrypt.Verify(password, user.Password);
-        }
-
-        private string HashPassword(string password)
-        {
-            return BCrypt.Net.BCrypt.HashPassword(password);
         }
     }
 }

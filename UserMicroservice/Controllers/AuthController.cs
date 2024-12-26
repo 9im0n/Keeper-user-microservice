@@ -38,7 +38,7 @@ namespace UserMicroservice.Controllers
 
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] AuthRequest request)
+        public IActionResult Register([FromBody] AuthRequestDTO request)
         {
             var validationResult = ValidateModelState();
             if (validationResult != null) return validationResult;
@@ -60,7 +60,7 @@ namespace UserMicroservice.Controllers
 
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] AuthRequest request)
+        public IActionResult Login([FromBody] AuthRequestDTO request)
         {
             var validationResult = ValidateModelState();
             if (validationResult != null) return validationResult;
@@ -70,6 +70,29 @@ namespace UserMicroservice.Controllers
                 var user = _authService.Login(request);
                 var tokens = _jwtService.CreateJwtTokens(user);
                 return Ok(new { message = "Login successful", tokens });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Problem(detail: ex.Message, statusCode: 500);
+            }
+        }
+
+
+        [HttpPost("refresh")]
+        public IActionResult Refresh([FromBody] RefreshRequestDTO request)
+        {
+            try
+            {
+                var tokens = _jwtService.UpdateJwtTokens(request.RefreshToken);
+                return Ok(tokens);
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (NotFoundException ex)
             {

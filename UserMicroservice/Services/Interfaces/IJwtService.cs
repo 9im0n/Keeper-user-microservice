@@ -5,7 +5,7 @@ namespace UserMicroservice.Services.Interfaces
 {
     public interface IJwtService
     {
-        public JwtResponse CreateJwtTokens(Users user);
-        public JwtResponse UpdateJwtTokens(string refreshToken);
+        public JwtResponseDTO CreateJwtTokens(Users user);
+        public JwtResponseDTO UpdateJwtTokens(string refreshToken);
     }
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace UserMicroservice.Models.DTO
 {
-    public class AuthRequest
+    public class AuthRequestDTO
     {
         [Required]
         [EmailAddress]

@@ -5,7 +5,7 @@ namespace UserMicroservice.Services.Interfaces
 {
     public interface IAuthService
     {
-        public Users Register(AuthRequest request);
-        public Users Login(AuthRequest request);
+        public Users Register(AuthRequestDTO request);
+        public Users Login(AuthRequestDTO request);
     }
 }
